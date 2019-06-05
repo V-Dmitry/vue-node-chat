@@ -12,21 +12,29 @@
 
 <script>
   import auth from '@/authentication.js'
-
+  
   export default ({
     data() {
       return {
         userName: null,
-        userPass: null
+        userPass: null,
+        user: {
+          authenticated: false
+        },
       }
     },
 
     methods: {
       authenticate() {
-        auth.authenticate(this, {username: this.userName, userpass: this.userPass}, '/')
+        if (!this.userName) alert('Необходимо ввести имя')
+        else if (!this.userPass) alert('Необходимо ввести пароль')
+        else {
+          auth.authenticate(this, {username: this.userName, userpass: this.userPass}, '/')
+        }
       }
     }
   })
+
 </script>
 
 <style>
@@ -35,4 +43,5 @@
     max-width: 30rem;
     margin: auto;
   }
+
 </style>

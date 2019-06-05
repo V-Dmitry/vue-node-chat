@@ -1,4 +1,4 @@
-# chat2
+# chat
 
 > chat
 
@@ -7,9 +7,13 @@
 ``` bash
 # install dependencies
 npm install
+сd nodejs
+npm install
 
-# serve with hot reload at localhost:8080
+# serve with hot reload at localhost:8000
 npm run dev
+cd nodejs
+npm start
 
 # build for production with minification
 npm run build

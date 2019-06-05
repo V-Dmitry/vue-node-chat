@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import Router from 'vue-router'
-import VueSocket from 'vue-socket.io'
+import VueSocketIO from 'vue-socket.io'
 
 import Auth from '@/components/auth'
 import Chat from '@/components/chat'
@@ -10,9 +10,9 @@ import auth from '@/authentication.js'
 Vue.config.productionTip = false
 Vue.use(Router)
 
-var socket = new VueSocket({
-	debug: true,
-	connection: 'http://localhost:3000'
+var socket = new VueSocketIO({
+    debug: true,
+    connection: 'http://localhost:3000'
 })
 
 Vue.use(socket)
@@ -50,7 +50,7 @@ router.beforeEach((to, from, next) => {
 	}
 })
 
-export {router, socket}
+export default router
 
 new Vue({
 	router,

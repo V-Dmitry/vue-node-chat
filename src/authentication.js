@@ -1,5 +1,3 @@
-import {router} from '@/main.js'
-import {socket} from '@/main.js'
 
 export default({
   user: { 
@@ -7,9 +5,9 @@ export default({
   },
 
   authenticate (context, user, redirect) {
-   this.user.authenticated = true
-   
-   router.push(redirect)
+    this.user.authenticated = true
+          context.$socket.emit('login', user)
+          context.$router.push('/')
   },
 
   checkAuthentication () {

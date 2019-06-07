@@ -7,6 +7,7 @@ export default({
   authenticate (context, user, redirect) {
     this.user.authenticated = true
           context.$socket.emit('login', user)
+          sessionStorage.setItem('username', user.username)
           context.$router.push('/')
   },
 

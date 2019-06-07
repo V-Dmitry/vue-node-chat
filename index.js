@@ -13,13 +13,8 @@ const server = app.listen(3000, function() {
 
 const socket = require('socket.io')(server);
 
-var message =  {
-	author: "",
-	text: "",
-	date: ""
-  }
-
 var messages = []
+var users = []
 
 socket.on('connect', function (client) {
 
@@ -29,14 +24,26 @@ socket.on('connect', function (client) {
 
 		client.on('login', function (user) {
 			console.log(`Пользователь ${user.username} вошел в чат`);
+			users.push(user.username)
+			client.emit('login', messages)
+			messages.push({text: `Пользователь ${user.username} вошел в чат`})
+			client.broadcast.emit('login', messages)
 		})
 
-		client.on('logout', function (user) {
-			console.log(`Пользователь ${user.username} вышел из чата`);
+		client.on('logout', function (username) {
+			console.log(`Пользователь ${username} вышел из чата`);
+			messages.push({text: `Пользователь ${username} вышел из чата`})
+			client.broadcast.emit('logout', messages[messages.length-1])
 		})
 
-		client.on('disconnect', function (user) {
-			console.log(`Пользователь ${user.username} отсоединился от чата`);
+		client.on('disconnect', function () {
+			console.log(`Пользователь отсоединился от чата`);
+		})
+
+		client.on('new-message', function (newmessage) {
+			messages.push(newmessage)
+			client.broadcast.emit('newMessage', newmessage)
+			client.emit('newMessage', newmessage)
 		})
 		
 	}

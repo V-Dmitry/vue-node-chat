@@ -1,8 +1,8 @@
 <template>
   <form class="form-signin text-center" name="form-signin" id="login">
     <h1 class="h2 mb-3 font-weight-normal">Вход в чат</h1>
-    <input v-model="userName" class="form-control" type="text" placeholder="Имя пользователя" required autofocus>
-    <input v-model="userPass" class="form-control" type="password" placeholder="Пароль" required>
+    <input v-model="userName" class="form-control" type="text" placeholder="Имя пользователя">
+    <input v-model="userPass" class="form-control" type="password" placeholder="Пароль">
     <input type="button" class="brd btn btn-lg btn-block" value="Войти" v-on:click="authenticate">
 
     <p class="info mt-5 mb-3 text-muted"><br>© Dmitry Voronchihin, 2019<br>vdima775@gmail.com</br></br></p>

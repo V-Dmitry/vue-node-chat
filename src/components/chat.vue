@@ -1,24 +1,29 @@
 <template>
   <div class="container back">
-      <button class='btn out'>Выйти из чата</button>
+    <button class='btn out' v-on:click="leftChat">Выйти из чата</button>
     <div class="chatroom">
+      <div class="users">
+        <ul v-for="user in users">
+          <li class="user">{{user.username}}</li>
+        </ul>
+      </div>
       <div id="window" class="window">
-        <ul v-for="message in messages">
+        <ul v-for="msg in messages">
           <li class="message">
             <div id="msAuthor">
-              {{message.author}}:
+              {{msg.author}}
             </div>
             <div id="msText">
-              {{message.text}}
+              {{msg.text}}
             </div>
             <div id="msDate">
-              {{message.date}}
+              {{msg.date}}
             </div>
           </li>
         </ul>
       </div>
       <div id="textMessage" class="sendMessage">
-        <input class="form-control" type="text" v-model="message">
+        <input class="form-control" type="text" v-model="message.text" autofocus>
         <button class='btn' v-on:click="push">Отправить</button>
       </div>
     </div>
@@ -26,28 +31,56 @@
 </template>
 
 <script>
+  import moment from "moment"
+
   export default ({
     data() {
       return {
-        message: null,
-        messages: []
+        message: {
+          author: null,
+          text: null,
+          date: null
+        },
+        messages: [],
+        users: []
       }
     },
 
     sockets: {
-      connect: function () {
-        console.log("is connected")
+      "connect": function () {
+        console.log("socket connected")
+      },
+
+      "newMessage": function (message) {
+        this.messages.push(message)
+      },
+
+      "login": function (messages) {
+        this.messages = messages
+      },
+
+      "logout": function (message) {
+        this.messages.push(message)
       }
     },
 
     methods: {
       push: function () {
-        this.$socket.emit('login')
-        this.messages.push({
-          author: "123",
-          text: this.message,
-          date: Date.now()
-        })
+        this.message.author = sessionStorage.getItem('username')
+        this.message.date = moment(new Date()).format('YYYY-MM-DD HH:mm')
+        this.$socket.emit('new-message', this.message)
+        this.resetMessage()
+      },
+
+      leftChat: function () {
+        this.$socket.emit("logout", sessionStorage.getItem('username'))
+        this.$router.push("/login")
+      },
+
+      resetMessage: function () {
+        this.message.author = null
+        this.message.text = null
+        this.message.date = null
       }
     }
   })
@@ -99,7 +132,7 @@
   }
 
   .back {
-    width: 100%;  
+    width: 100%;
     height: 100%;
   }
 

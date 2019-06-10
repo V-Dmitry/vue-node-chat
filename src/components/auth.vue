@@ -4,9 +4,8 @@
     <input v-model="userName" class="form-control" type="text" placeholder="Имя пользователя">
     <input v-model="userPass" class="form-control" type="password" placeholder="Пароль">
     <input type="button" class="brd btn btn-lg btn-block" value="Войти" v-on:click="authenticate">
-
+    <p class="text-muted">Если пользователь ранее не зарегистрирован, то будет создан новый</p>
     <p class="info mt-5 mb-3 text-muted"><br>© Dmitry Voronchihin, 2019<br>vdima775@gmail.com</br></br></p>
-
   </form>
 </template>
 
@@ -21,6 +20,16 @@
         user: {
           authenticated: false
         },
+      }
+    },
+
+    sockets: {
+      "login-success": function() {
+        this.$router.push('/')
+      },
+
+      "login-fail": function() {
+        alert("Неверный пароль!")
       }
     },
 

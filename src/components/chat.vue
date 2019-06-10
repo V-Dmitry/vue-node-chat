@@ -51,15 +51,15 @@
         console.log("socket connected")
       },
 
-      "newMessage": function (message) {
+      "new-message": function (message) {
         this.messages.push(message)
       },
 
-      "login": function (messages) {
-        this.messages = messages
+      "login": function (msgList) {
+        this.messages = msgList
       },
 
-      "logout": function (message) {
+      "user-logout": function(message) {
         this.messages.push(message)
       }
     },
@@ -73,6 +73,9 @@
       },
 
       leftChat: function () {
+        this.messages = []
+        this.resetMessage()
+        sessionStorage.removeItem('token')
         this.$socket.emit("logout", sessionStorage.getItem('username'))
         this.$router.push("/login")
       },

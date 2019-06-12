@@ -24,9 +24,14 @@
     },
 
     sockets: {
-      "login-success": function() {
+      "connect": function () {
+        console.log("socket connected")
+      },
+      
+      "login-success": function(token) {
         auth.user.authenticated = true
         sessionStorage.setItem('username', this.userName)
+        sessionStorage.setItem('token', token)
         this.$router.push('/')
       },
 

@@ -52,7 +52,12 @@
 
     sockets: {
       "connect": function () {
-        console.log("socket connected")
+        this.$socket.emit('update')
+      },
+
+      "update": function (data) {
+        this.mesasges = data.messages
+        this.users = data.users
       },
 
       "new-message": function (message) {

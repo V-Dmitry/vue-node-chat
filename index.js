@@ -44,8 +44,8 @@ function getUsers(callback) {
 		})
 }
 
-function logIn(client, msgs, users, user) {
-	client.emit('login-success')
+function logIn(client, msgs, users, user, token) {
+	client.emit('login-success', token)
 	client.broadcast.emit('new-message', { text: `Пользователь ${user.username} вошел в чат` })
 	client.emit('login', msgs)
 	client.broadcast.emit('get-users', users)
@@ -55,11 +55,11 @@ function logIn(client, msgs, users, user) {
 function logOut(client, username) {
 	client.broadcast.emit('user-logout', { text: `Пользователь ${username} вышел из чата` })
 	dbclient.query('update public.user set status=2 where username=$1', [username])
-	.then(() => {
-		getUsers(function(users) {
-			client.broadcast.emit('get-users', users)
+		.then(() => {
+			getUsers(function (users) {
+				client.broadcast.emit('get-users', users)
+			})
 		})
-	})
 }
 
 socket.on('connect', function (client) {
@@ -75,13 +75,13 @@ socket.on('connect', function (client) {
 					if (res.rowCount > 0) {
 						if (bcrypt.compareSync(user.userpass, res.rows[0].password)) {
 							dbclient.query('update public.user set status=1 where username=$1', [user.username])
-							.then(() => {
-								getMessages(function (msgs) {
-									getUsers(function (users) {
-										logIn(client, msgs, users, user)
+								.then(() => {
+									getMessages(function (msgs) {
+										getUsers(function (users) {
+											logIn(client, msgs, users, user, token)
+										})
 									})
 								})
-							})
 							console.log(`Пользователь ${user.username} вошел в чат`);
 						}
 						else {
@@ -92,13 +92,13 @@ socket.on('connect', function (client) {
 						dbclient.query('insert into public.user(username, password) values ($1,$2) returning username', [user.username, bcrypt.hashSync(user.userpass, salt)])
 							.then((newuser) => {
 								dbclient.query('update public.user set status=1 where username=$1', [user.useername])
-								.then(() => {
-									getMessages(function (msgs) {
-										getUsers(function (users) {
-											logIn(msgs, users, newuser)
+									.then(() => {
+										getMessages(function (msgs) {
+											getUsers(function (users) {
+												logIn(msgs, users, newuser, token)
+											})
 										})
 									})
-								})
 								console.log(`Пользователь ${user.username} вошел в чат`);
 							})
 							.catch((err) => {
@@ -110,6 +110,14 @@ socket.on('connect', function (client) {
 					console.log(err)
 				})
 
+		})
+
+		client.on('update', function () {
+			getMessages(function (msgs) {
+				getUsers(function (users) {
+					socket.emit('update', { messages: msgs, users: users })
+				})
+			})
 		})
 
 		client.on('logout', function (username) {

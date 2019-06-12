@@ -68,7 +68,7 @@
         this.users = users
       },
 
-      "login": function (msgList) {
+      "get-messages": function (msgList) {
         this.messages = msgList
       },
 

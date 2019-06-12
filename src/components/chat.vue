@@ -56,7 +56,7 @@
       },
 
       "update": function (data) {
-        this.mesasges = data.messages
+        this.messages = data.messages
         this.users = data.users
       },
 
@@ -89,11 +89,13 @@
       },
 
       leftChat: function () {
-        this.messages = []
-        this.resetMessage()
-        sessionStorage.removeItem('token')
-        this.$socket.emit("logout", sessionStorage.getItem('username'))
-        this.$router.push("/login")
+        if(confirm('Выйти из чата?')) {
+          this.messages = []
+          this.resetMessage()
+          sessionStorage.removeItem('token')
+          this.$socket.emit("logout", sessionStorage.getItem('username'))
+          this.$router.push("/login")
+        }
       },
 
       resetMessage: function () {
@@ -120,14 +122,14 @@
     min-height: 62.5rem;
     max-height: 62.5rem;
     background-color: cornsilk;
+    border-style: groove;
     overflow-y: auto;
-    border-style:groove;
   }
 
   .message {
     max-width: 30rem;
     background-color: lightgray;
-    border-radius: .5rem;
+    border-radius: 1rem;
     padding: .5rem .5rem .5rem .5rem;
   }
 

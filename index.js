@@ -25,7 +25,7 @@ const socket = require('socket.io')(server);
 function getMessages(callback) {
 	dbclient.query('select message.id, "user".username as author, message.text, message.date \
 	from message \
-	inner join "user" on "user".id = message.user_id')
+	left join "user" on "user".id = message.user_id')
 		.then((res) => {
 			callback(res.rows)
 		})
@@ -69,9 +69,9 @@ socket.on('connect', function (client) {
 	try {
 
 		client.on('login', function (user) {
+			var token = jwt.sign({ id: user.username }, secret)
 			dbclient.query('select id, username, password from public.user where username=$1', [user.username])
 				.then((res) => {
-					var token = jwt.sign({ id: user.username }, secret)
 					if (res.rowCount > 0) {
 						if (bcrypt.compareSync(user.userpass, res.rows[0].password)) {
 							dbclient.query('update public.user set status=1 where username=$1', [user.username])

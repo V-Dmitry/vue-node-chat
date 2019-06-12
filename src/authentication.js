@@ -4,12 +4,6 @@ export default ({
     authenticated: false
   },
 
-  authenticate(context, user) {
-    this.user.authenticated = true
-    context.$socket.emit('login', user)
-    sessionStorage.setItem('username', user.username)
-  },
-
   checkAuthentication() {
     const token = sessionStorage.getItem('token')
 

@@ -34,8 +34,32 @@ function getMessages(callback) {
 		})
 }
 
-function getUsers() {
-	dbClient.query('select id, username from public.user')
+function getUsers(callback) {
+	dbclient.query('select id, username from public.user where status=1')
+		.then((res) => {
+			callback(res.rows)
+		})
+		.catch((err) => {
+			console.log(err)
+		})
+}
+
+function logIn(client, msgs, users, user) {
+	client.emit('login-success')
+	client.broadcast.emit('new-message', { text: `Пользователь ${user.username} вошел в чат` })
+	client.emit('login', msgs)
+	client.broadcast.emit('get-users', users)
+	client.emit('get-users', users)
+}
+
+function logOut(client, username) {
+	client.broadcast.emit('user-logout', { text: `Пользователь ${username} вышел из чата` })
+	dbclient.query('update public.user set status=2 where username=$1', [username])
+	.then(() => {
+		getUsers(function(users) {
+			client.broadcast.emit('get-users', users)
+		})
+	})
 }
 
 socket.on('connect', function (client) {
@@ -47,13 +71,16 @@ socket.on('connect', function (client) {
 		client.on('login', function (user) {
 			dbclient.query('select id, username, password from public.user where username=$1', [user.username])
 				.then((res) => {
+					var token = jwt.sign({ id: user.username }, secret)
 					if (res.rowCount > 0) {
 						if (bcrypt.compareSync(user.userpass, res.rows[0].password)) {
-							var token = jwt.sign({id:user.username}, secret)
-							getMessages(function(res) {
-								client.emit('login-success')
-								client.broadcast.emit('new-message', {text:`Пользователь ${user.username} вошел в чат`})
-								client.emit('login', res)
+							dbclient.query('update public.user set status=1 where username=$1', [user.username])
+							.then(() => {
+								getMessages(function (msgs) {
+									getUsers(function (users) {
+										logIn(client, msgs, users, user)
+									})
+								})
 							})
 							console.log(`Пользователь ${user.username} вошел в чат`);
 						}
@@ -62,12 +89,15 @@ socket.on('connect', function (client) {
 						}
 					}
 					else {
-						dbclient.query('insert into public.user(username, password) values ($1,$2)', [user.username, bcrypt.hashSync(user.userpass, salt)])
-							.then((res) => {
-								getMessages((res) => {
-									client.emit('login-success')
-									client.broadcast.emit('new-message', {text:`Пользователь ${user.username} вошел в чат`})
-									client.emit('login', res)
+						dbclient.query('insert into public.user(username, password) values ($1,$2) returning username', [user.username, bcrypt.hashSync(user.userpass, salt)])
+							.then((newuser) => {
+								dbclient.query('update public.user set status=1 where username=$1', [user.useername])
+								.then(() => {
+									getMessages(function (msgs) {
+										getUsers(function (users) {
+											logIn(msgs, users, newuser)
+										})
+									})
 								})
 								console.log(`Пользователь ${user.username} вошел в чат`);
 							})
@@ -84,7 +114,7 @@ socket.on('connect', function (client) {
 
 		client.on('logout', function (username) {
 
-			client.broadcast.emit('user-logout', {text: `Пользователь ${username} вышел из чата`})
+			logOut(client, username)
 			console.log(`Пользователь ${username} вышел из чата`);
 		})
 

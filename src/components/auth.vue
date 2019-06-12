@@ -25,11 +25,13 @@
 
     sockets: {
       "login-success": function() {
+        auth.user.authenticated = true
+        sessionStorage.setItem('username', this.userName)
         this.$router.push('/')
       },
 
       "login-fail": function() {
-        alert("Неверный пароль!")
+        alert("Такой пользователь существует. Неверный пароль!")
       }
     },
 
@@ -38,7 +40,7 @@
         if (!this.userName) alert('Необходимо ввести имя')
         else if (!this.userPass) alert('Необходимо ввести пароль')
         else {
-          auth.authenticate(this, {username: this.userName, userpass: this.userPass}, '/')
+          this.$socket.emit('login', {username: this.userName, userpass: this.userPass})
         }
       }
     }

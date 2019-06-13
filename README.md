@@ -1,19 +1,16 @@
 # chat
 
-> chat
+> Чат
 
 ## Build Setup
 
 ``` bash
 # install dependencies
 npm install
-сd nodejs
-npm install
 
-# serve with hot reload at localhost:8000
-npm run dev
-cd nodejs
-npm start
+# serve with hot reload
+npm run dev	# for start vue dev on 8000 port
+npm start	# for start nodejs on 3000 port
 
 # build for production with minification
 npm run build

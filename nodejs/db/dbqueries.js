@@ -2,7 +2,7 @@ const dbclient = require('./dbconnect')
 
 module.exports = {
 
-    getMessages: function (callback) {
+    getMessages: function (callback) {  // функция получения истории сообщений
         dbclient.query('select message.id, "user".username as author, message.text, message.date \
     from message \
     left join "user" on "user".id = message.user_id')
@@ -14,7 +14,7 @@ module.exports = {
             })
     },
 
-    addMessage: function (message, callback) {
+    addMessage: function (message, callback) {  // функция добавления нового сообщения в базу
         dbclient.query('insert into message(user_id, text, date) values ((select id from public.user where username=$1), $2, $3::abstime)', [message.author, message.text, message.date])
             .then(() => {
                 callback()
@@ -24,7 +24,7 @@ module.exports = {
             })
     },
 
-    getOnlineUsers: function (callback) {
+    getOnlineUsers: function (callback) {   // функция получения актуального псиска пользователей в чате
         dbclient.query('select id, username from public.user where status=1')
             .then((res) => {
                 callback(res.rows)
@@ -34,7 +34,7 @@ module.exports = {
             })
     },
 
-    getUserByName: function (user, callback) {
+    getUserByName: function (user, callback) {  // функция получения пользователя по его имени
         dbclient.query('select id, username, password from public.user where username=$1', [user.username])
             .then((res) => {
                 callback(res)
@@ -44,7 +44,7 @@ module.exports = {
             })
     },
 
-    addUser: function (cryptFunc, user, salt, callback) {
+    addUser: function (cryptFunc, user, salt, callback) {   // функция добавления нового пользователя
         dbclient.query('insert into public.user(username, password) values ($1,$2) returning username', [user.username, cryptFunc.hashSync(user.userpass, salt)])
             .then((res) => {
                 callback(res.rows[0])
@@ -54,7 +54,7 @@ module.exports = {
             })
     },
 
-    changeStatus: function (username, status, callback) {
+    changeStatus: function (username, status, callback) {   // функция изменения статуса пользователя
         dbclient.query('update public.user set status=$2 where username=$1', [username, status])
             .then(() => {
                 callback()

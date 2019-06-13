@@ -86,12 +86,4 @@ module.exports = function (server) {
             client.disconnect();
         }
     })
-
-    function loginSuccess(client, msgs, users, user, token) {
-        client.emit('login-success', token)
-        client.broadcast.emit('new-message', { text: `Пользователь ${user.username} вошел в чат` })
-        client.emit('get-messages', msgs)
-        client.broadcast.emit('get-users', users)
-        client.emit('get-users', users)
-    }
 }
